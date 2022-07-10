@@ -1,36 +1,15 @@
-FROM alpine:latest
+FROM php:fpm-alpine
 
 #* default workdir.
 WORKDIR /var/www/html
 
-#* Laravel lumen requirements. 
-RUN apk  --no-cache add \
-php8 \
-php8-fpm \
-php8-pdo \
-php8-mbstring \
-php8-openssl
-
-#* Laravel requires json, dom and curl to work with lumen added this extra info. 
-RUN apk --no-cache add \
-php8-json \
-php8-dom \
-curl \
-php8-curl \
-php8-tokenizer
-
-#* Composer dependency
-RUN apk --no-cache add \
-php8-phar \
-php8-xml \
-php8-xmlwriter
-
-#* RUN  PHP docker
+#* Run the composer installation. 
+#* if needed update plugin / vendor used
 RUN php -r "copy('http://getcomposer.org/installer', 'composer-setup.php');" && \
 php composer-setup.php --install-dir=/usr/bin --filename=composer && \
 php -r "unlink('composer-setup.php');"
 
-# copy all of the file in folder to /var/www/html
+#* copy all of the file in folder to working directory, in this case /var/www/html
 COPY . .
 
 RUN composer update
