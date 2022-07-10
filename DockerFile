@@ -12,7 +12,7 @@ php8-mbstring \
 php8-openssl
 
 #* Laravel requires json, dom and curl to work with lumen added this extra info. 
-RUN apk --no-chace add \
+RUN apk --no-cache add \
 php8-json \
 php8-dom \
 curl \
