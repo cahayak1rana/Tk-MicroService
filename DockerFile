@@ -1,0 +1,19 @@
+FROM alpine:latest
+
+#default workdir.
+WORKDIR /var/www/html
+
+#Laravel lumen requirements. 
+RUN apk  --no-cache add \
+php8 \
+php8-fpm \
+php8-pdo \
+php8-mbstring \
+php8-openssl
+
+#Laravel requires json, dom and curl to work with lumen added this extra info. 
+RUN apk --no-chace add \
+php8-json \
+php8-dom \
+curl \
+php8-curl
