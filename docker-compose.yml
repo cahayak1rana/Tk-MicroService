@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  lumen:
+  #* Serve composer at port 8000
+    ports:
+      - "8000:8000"
+  #* Working directory mount. 
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/vendor/
+    build: .
+  #* command to be executed.
+    command: php -S lumen:8000 -t public
+    restart: always
