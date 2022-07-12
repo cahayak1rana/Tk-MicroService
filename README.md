@@ -1,3 +1,14 @@
+# TK Microservice
+This project is a quick-start mailing API for microservice mail sender. 
+
+## Technologies
+- Lumen, Lumen is chosen as part of the requirements of the task, since it iis lightweight and designed for microservice. 
+- Custom mail transport is used by extending the mailable class of laravel. 
+- Two mail custom drivers are used.
+
+## Custom mail driver.
+The custom mail driver is built based on the custom transport of mailgun. 
+
 # Lumen PHP Framework
 
 [![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
@@ -22,3 +33,5 @@ If you discover a security vulnerability within Lumen, please send an e-mail to 
 ## License
 
 The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
