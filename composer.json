@@ -11,6 +11,7 @@
         "guzzlehttp/streams": "^3.0",
         "illuminate/mail": "^9.19",
         "laravel/lumen-framework": "^9.0",
+        "mailjet/mailjet-apiv3-php": "^1.5",
         "symfony/http-client": "^6.1",
         "symfony/mailgun-mailer": "^6.1"
     },

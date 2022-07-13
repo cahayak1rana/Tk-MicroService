@@ -7,7 +7,16 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\MessageConverter;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Config;
+use \Mailjet\Resources;
 
+/**
+ * This is a custom mailer used to send an email. In this case we don't use the code 
+ * 2022-07-08   Charles Initial creation. 
+ * @category    Custommailer
+ * @package     CustomMailer
+ * @version     0.1
+ */
 class CustomTransport
 {
     /**
@@ -70,7 +79,7 @@ class CustomTransport
      *
      * Initiate the class properties.
      */
-    public function __construct($key, $url)
+    public function __construct($key = '', $url ='')
     {
         $this->initiate();
         $this->key = $key;
@@ -487,6 +496,47 @@ class CustomTransport
             ]);
 
             return $response;
+        }
+        else if ($request_type == 'mailjet') {
+            // Retrieve config baesd on request type. 
+            // Setup headers that will be filled in by the looping of config. 
+            // We assume the config always exists. 
+            $config = Config::get('services.'.$request_type, []);
+
+            $apikey = 'a3cc5a09618fbdc9f0421c118906b9d1';
+            $apisecret ='deb61b2a93d367ba994a71e9dc160462';
+
+            $mj = new \Mailjet\Client($apikey, $apisecret,true,['version' => 'v3.1']);
+            
+            $body = [
+                'Messages' => [
+                  [
+                    'From' => [
+                      'Email' => "gsk.player.12@gmail.com",
+                      'Name' => "Chaya"
+                    ],
+                    'To' => [
+                      [
+                        'Email' => "gsk.player.12@gmail.com",
+                        'Name' => "Chaya"
+                      ]
+                    ],
+                    'Subject' => "Greetings from Mailjet.",
+                    'TextPart' => "My first Mailjet email",
+                    'HTMLPart' => "<h3>Dear passenger 1, welcome to <a href='https://www.mailjet.com/'>Mailjet</a>!</h3><br />May the delivery force be with you!",
+                    'CustomID' => "AppGettingStartedTest"
+                  ]
+                ]
+              ];
+            
+             // All resources are located in the Resources class
+
+            $response = $mj->post(Resources::$Email, ['body' => $body]);
+
+            // Read the response
+
+            $response->success() && var_dump($response->getData());
+        
         }
         else {
 
