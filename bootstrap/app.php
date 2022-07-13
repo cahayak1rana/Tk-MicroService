@@ -101,7 +101,8 @@ $app->configure('mail');
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
-$app->register(App\Providers\CustomMailServiceProvider::class);
+$app->register(App\Providers\CustomMailProvider::class);
+//$app->register(Illuminate\Mail\MailServiceProvider::class);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
