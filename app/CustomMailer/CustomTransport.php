@@ -23,6 +23,13 @@ class CustomTransport
      * @var array $to 
      */
     public $to = array();
+    
+
+    /**
+     * @var array $to 
+     */
+    public $from;
+    
 
     /**
      * @var string $subject
@@ -63,6 +70,11 @@ class CustomTransport
      * @var String $driver_url
      */
     public $driver_url;
+    
+    /**
+     * @var Boolean $is_html
+     */
+    public $is_html;
 
     /**
      * Named constructor.
@@ -97,12 +109,14 @@ class CustomTransport
     {
         $this->to = array();
         $this->headers = array();
-        $this->_subject = null;
+        $this->subject = null;
         $this->message = null;
         $this->_wrap = 78;
         $this->parameters = null;
         $this->attachments = array();
         $this->_uid = $this->getUniqueId();
+        $this->from = null;
+        $this->is_html = false;
         return $this;
     }
 
@@ -114,9 +128,15 @@ class CustomTransport
      *
      * @return self
      */
-    public function setTo($email, $name)
+    public function setTo($email, $name, $format = 'text')
     {
-        $this->to[] = $this->formatHeader((string) $email, (string) $name);
+        if ($format == 'text') {
+            $this->to[] = $this->formatHeader((string) $email, (string) $name);
+        }
+        else {
+            $this->to[] = array('email' => $this->filterEmail((string) $email), 'name' => (!empty($name) ? $this->filterName((string) $name) : $this->filterEmail((string) $email)));
+        }
+        
         return $this;
     }
 
@@ -143,6 +163,10 @@ class CustomTransport
     public function setFrom($email, $name)
     {
         $this->addMailHeader('From', (string) $email, (string) $name);
+        $this->from = array(
+            'email' => $email,
+            'name'  => $name
+        );
         return $this;
     }
 
@@ -190,6 +214,7 @@ class CustomTransport
      */
     public function setHtml()
     {
+        $this->is_html = true;
         return $this->addGenericHeader(
             'Content-Type', 'text/html; charset="utf-8"'
         );
@@ -204,7 +229,7 @@ class CustomTransport
      */
     public function setSubject($subject)
     {
-        $this->_subject = $this->encodeUtf8(
+        $this->subject = $this->encodeUtf8(
             $this->filterOther((string) $subject)
         );
         return $this;
@@ -217,7 +242,7 @@ class CustomTransport
      */
     public function getSubject()
     {
-        return $this->_subject;
+        return $this->subject;
     }
 
     /**
@@ -483,11 +508,12 @@ class CustomTransport
      * @return boolean
      * @throws \RuntimeException on no 'To: ' address to send to.
      */
-    public function send($request_type = '')
+    public function send($request_type = '', $extra_parameters=array())
     {
         
         if ($request_type == 'postman') {
             // Use http response to initial tre request to the server. 
+            // THis is a test code to test postman. 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->key,
                 'Accept'        => 'application/json',
@@ -503,39 +529,43 @@ class CustomTransport
             // We assume the config always exists. 
             $config = Config::get('services.'.$request_type, []);
 
-            $apikey = 'a3cc5a09618fbdc9f0421c118906b9d1';
-            $apisecret ='deb61b2a93d367ba994a71e9dc160462';
+            $apikey = $config['apikey'];
+            $apisecret = $config['apisecret'];
 
             $mj = new \Mailjet\Client($apikey, $apisecret,true,['version' => 'v3.1']);
-            
+
+            // Populate recipients.
+
             $body = [
                 'Messages' => [
                   [
                     'From' => [
-                      'Email' => "gsk.player.12@gmail.com",
-                      'Name' => "Chaya"
+                      'Email' => $this->from['email'],
+                      'Name' => $this->from['name']
                     ],
-                    'To' => [
-                      [
-                        'Email' => "gsk.player.12@gmail.com",
-                        'Name' => "Chaya"
-                      ]
-                    ],
-                    'Subject' => "Greetings from Mailjet.",
-                    'TextPart' => "My first Mailjet email",
+                    'To' => $this->to,
+                    'Subject' => $this->subject,
+                    'TextPart' => $this->message,
                     'HTMLPart' => "<h3>Dear passenger 1, welcome to <a href='https://www.mailjet.com/'>Mailjet</a>!</h3><br />May the delivery force be with you!",
-                    'CustomID' => "AppGettingStartedTest"
                   ]
                 ]
               ];
+
+            if (!empty($extra_parameters)) {
+                
+                foreach ($extra_parameters as $key => $value) {
+                    $body['Messages'][$key] = $value;
+                }
+            }
             
              // All resources are located in the Resources class
 
             $response = $mj->post(Resources::$Email, ['body' => $body]);
 
             // Read the response
+            $response->success();// && var_dump($response->getData());
 
-            $response->success() && var_dump($response->getData());
+            return $response;
         
         }
         else {
@@ -557,7 +587,7 @@ class CustomTransport
                 $message = $this->getWrapMessage();
             }
     
-            return mail($to, $this->_subject, $message, $headers, $this->parameters);
+            return mail($to, $this->subject, $message, $headers, $this->parameters);
         }
         
     }

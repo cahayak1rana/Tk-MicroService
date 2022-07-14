@@ -27,6 +27,7 @@ return [
         'timeout'   => env('MAILTRAP_TIMEOUT')
     ],
     'mailjet' => [
-        'auth'      => ['a3cc5a09618fbdc9f0421c118906b9d1', 'deb61b2a93d367ba994a71e9dc160462']
+        'apikey'      => env('MAILJET_API'),
+        'apisecret'   => env('MAILJET_API_SECRET')
     ]
 ];
