@@ -22,6 +22,7 @@ class SendEmail extends Command
                                 {mail-type} 
                                 {driver-type}
                                 {custom-id}
+                                {queue}
                                 {send-to* : Array of recipients, use string format with pipe as separator e.g array("test@test.com|Testing user")} 
                                 ';
 
