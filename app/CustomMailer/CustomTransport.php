@@ -558,7 +558,7 @@ class CustomTransport
             $this->setEmailsModel($request_type);
 
 
-            return $response;
+            return $response->successful();
         }
         else if ($request_type == 'mailjet') {
             // Retrieve config based on request type. 
@@ -603,6 +603,30 @@ class CustomTransport
             $response->success();// && var_dump($response->getData());
         
             return $response->success();
+        
+        }
+        else if ($request_type == 'sendgrid') {
+            // Retrieve config based on request type. 
+            // Setup headers that will be filled in by the looping of config. 
+            // We assume the config always exists. 
+            $config = Config::get('services.'.$request_type, []);
+
+            $domain = $config['domain'];
+            $apisecret = $config['secret'];
+
+            $email = new \SendGrid\Mail\Mail(); 
+            $email->setFrom($this->from['email'], $this->from['name']);
+            $email->setSubject($this->subject);
+           
+            foreach ($this->to as $key => $email_data) {
+                $email->addTo($email_data['email'], (isset($email_data['name'])? $email_data['name'] : $email_data['email']));
+            }
+
+            $email->addContent("text/html", $this->message);
+           
+            $sendgrid = new \SendGrid($apisecret);
+            $response = $sendgrid->send($email);
+            return $response;
         
         }
         else {

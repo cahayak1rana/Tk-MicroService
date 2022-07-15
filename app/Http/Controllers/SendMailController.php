@@ -26,7 +26,7 @@ class SendMailController extends Controller
 
         /**
          * [
-         *   'Email' => "gsk.player.12@gmail.com",
+         *   'Email' => "asdf@gmail.com",
          *   'Name' => "Chaya"
         *  ]
          */
