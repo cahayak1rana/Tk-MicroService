@@ -9,6 +9,9 @@ use Symfony\Component\Mime\MessageConverter;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 use \Mailjet\Resources;
+use App\Models\Emails;
+use Illuminate\Http\Client\Request;
+use phpDocumentor\Reflection\Types\Resource_;
 
 /**
  * This is a custom mailer used to send an email. In this case we don't use the code 
@@ -502,6 +505,38 @@ class CustomTransport
         return implode(PHP_EOL, $head);
     }
 
+    public function setEmailsModel($request_type) {
+        Emails::create([
+            'email_from'    => $this->from['email'],
+            'email_to'      => $this->getToForSend(),
+            'email_type'    => $this->is_html,
+            'email_message'  => $this->message,
+            'email_sender_driver' => $request_type,
+            'email_sender_ip_address' => ''
+        ]);
+    }
+
+    /**
+     * Function to process send data. 
+     */
+    public function processSend($request_type = '', $extra_parameters = array(), $retry = 2) {
+        $mailconfigs = Config::get('services', []);
+
+        $success = $this->send($request_type, $extra_parameters);
+        $max_retry = $retry;
+
+        if (!$success && $max_retry >= 0) {
+            $max_retry -= 1;
+            foreach ($mailconfigs as $config_name => $config_data) {
+                if ($config_name !== $request_type) {
+                    $this->processSend($request_type, $extra_parameters, $max_retry);
+                }                
+            }
+        }
+
+        return $success;        
+    }
+
     /**
      * send
      *
@@ -520,11 +555,13 @@ class CustomTransport
             ])->post($this->driver_url.'/post', [
                 
             ]);
+            $this->setEmailsModel($request_type);
+
 
             return $response;
         }
         else if ($request_type == 'mailjet') {
-            // Retrieve config baesd on request type. 
+            // Retrieve config based on request type. 
             // Setup headers that will be filled in by the looping of config. 
             // We assume the config always exists. 
             $config = Config::get('services.'.$request_type, []);
@@ -561,11 +598,11 @@ class CustomTransport
              // All resources are located in the Resources class
 
             $response = $mj->post(Resources::$Email, ['body' => $body]);
-
+            $this->setEmailsModel($request_type);
             // Read the response
             $response->success();// && var_dump($response->getData());
-
-            return $response;
+        
+            return $response->success();
         
         }
         else {
@@ -579,14 +616,14 @@ class CustomTransport
                     'Unable to send, no To address has been set.'
                 );
             }
-    
+
             if ($this->hasAttachments()) {
                 $message  = $this->assembleAttachmentBody();
                 $headers .= PHP_EOL . $this->assembleAttachmentHeaders();
             } else {
                 $message = $this->getWrapMessage();
             }
-    
+            $this->setEmailsModel($request_type);
             return mail($to, $this->subject, $message, $headers, $this->parameters);
         }
         
@@ -771,7 +808,19 @@ class CustomTransport
         if (empty($this->to)) {
             return '';
         }
-        return join(', ', $this->to);
+
+        $to_addresses = '';
+        foreach ($this->to as $key => $to_address) {
+            if ($to_address['name']) {
+                $to_addresses .= $to_address['name'] . '<' .$to_address['email'] . '>,';
+            }
+            else {
+                $to_addresses .= $to_address['email'].',';
+            }
+            
+        }
+
+        return $to_addresses;
     }
 
     /**

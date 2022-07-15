@@ -4,19 +4,51 @@ This project is a quick-start mailing API for microservice mail sender.
 ## Table of contents
 
 - [Technologies](#technologies)
+- [Installation](#installation)
+- [Configuration](#configuration)
 - [Custom mail driver](#custom-mail-driver)
     - [json Body request](#json-body-request)
+- [Lumen](#lumen)
 
 ## Technologies
 - Lumen, Lumen is chosen as part of the requirements of the task, since it iis lightweight and designed for microservice. 
 - Custom mail transport is used by extending the mailable class of laravel. 
 - Two mail custom drivers are used.
 - Continue with Guzzle update and also . 
+- Eloquent is used to store log information of emails.
+- For queue and dispatcher, I choose to use the default queue of Laravel since it is easier to implement. 
+
+## Installation
+- Clone/fork the master branch.
+- Add mysql-data folder in the root, e.g.
+    ```
+    Tk-microservice
+    |-app
+    |-resources
+    |-mysql-data
+    ```
+- Setup 
+- Configure the SMTP framework in the ssmtp.conf. e.g. (for mailtrap)
+    ```
+    root=postmaster
+    mailhub=smtp.mailtrap.io:2525
+    FromLineOverride=YES
+    AuthUser=
+    AuthPass=
+    UseSTARTTLS=YES
+    ```
+- Run the docker-compose command. 
+
 
 ## Custom mail driver.
-The custom mail driver was previously intended to be built based on the custom transport of mailgun. But after trying to understand the requirements, I have decided to use simple PHP implementation.
-The mail driver and manager is still in used but at this stage serve no purpose. 
+The custom mail driver was previously intended to be built based on the custom transport of mailgun. But after trying to understand the requirements, I have decided to use simple PHP implementation of mail delivery that utilize the PHP mail functionality. Inspired by some code from O'Brien (https://eoghanobrien.com). The problem that I faced with this approach is the lack of feature and SMTP configuration, that is why I have decided to use SSMTP to have SMTP service on the server. 
 
+The custom driver currently have two kinds of information:
+- 
+
+
+
+## 
 
 #### Sending mail via JSON request.
 You can access the sendmail via http://localhost:8000/api/sendmail
@@ -26,16 +58,16 @@ Here is the default json body that can be sent
 {
 	"subject": "My First Post!",
     "message": "This is my first mail",
-	"from_email":   "gsk.player.12@gmail.com",
-	"to": "gsk.player.12@gmail.com",
+    "from_email":   "gsk.player.12@gmail.com",
+    "to": "gsk.player.12@gmail.com",
     "send_to": [
-		{
-			"send_to_email":"gsk.player.12@gmail.com",
-			"send_to_name":"GSK"
-		}
-	],
-	"custom_id" : "AppGettingStartedTest",
-	"mail_type" : "mailjet"
+        {
+            "send_to_email":"gsk.player.12@gmail.com",
+            "send_to_name":"GSK"
+        }
+    ],
+    "custom_id" : "AppGettingStartedTest",
+    "mail_type" : "mailjet"
 }
 ```
 
