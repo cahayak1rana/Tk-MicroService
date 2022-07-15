@@ -11,9 +11,17 @@ return [
     | to have a conventional place to find your various credentials.
     |
     */
+    'mailjet' => [
+        'apikey'      => env('MAILJET_API'),
+        'apisecret'   => env('MAILJET_API_SECRET')
+    ],
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),
+    ],
+    'mandrill' => [
+        'domain' => env('MANDRILL_DOMAIN'),
+        'secret' => env('MANDRILL_SECRET'),
     ],
     'custom_mail' => [
         'url' => env('CUSTOM_MAIL_URL'),
@@ -25,9 +33,5 @@ return [
         'username'  => env('MAILTRAP_USERNAME'),
         'password'  => env('MAILTRAP_PASSWORD'),
         'timeout'   => env('MAILTRAP_TIMEOUT')
-    ],
-    'mailjet' => [
-        'apikey'      => env('MAILJET_API'),
-        'apisecret'   => env('MAILJET_API_SECRET')
     ]
 ];
