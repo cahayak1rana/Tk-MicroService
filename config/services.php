@@ -23,6 +23,10 @@ return [
         'domain' => env('MANDRILL_DOMAIN'),
         'secret' => env('MANDRILL_SECRET'),
     ],
+    'sendgrid' => [
+        'domain' => env('SENDGRID_DOMAIN'),
+        'secret' => env('SENDGRID_SECRET'),
+    ],
     'custom_mail' => [
         'url' => env('CUSTOM_MAIL_URL'),
         'key' => env('CUSTOM_MAIL_API_KEY')
