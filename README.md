@@ -8,6 +8,9 @@ This project is a quick-start mailing API for microservice mail sender.
 - [Configuration](#configuration)
 - [Custom mail driver](#custom-mail-driver)
     - [json Body request](#json-body-request)
+- [Command line access](#command-line-access)
+- [Queue]
+- [Logging]
 - [Lumen](#lumen)
 
 ## Technologies
@@ -37,37 +40,96 @@ This project is a quick-start mailing API for microservice mail sender.
     AuthPass=
     UseSTARTTLS=YES
     ```
-- Run the docker-compose command. 
-
+- Run the docker-compose command in the root folder of this project. 
+    ```
+    docker-compose --env-file .env up --build
+    ```
 
 ## Custom mail driver.
 The custom mail driver was previously intended to be built based on the custom transport of mailgun. But after trying to understand the requirements, I have decided to use simple PHP implementation of mail delivery that utilize the PHP mail functionality. Inspired by some code from O'Brien (https://eoghanobrien.com). The problem that I faced with this approach is the lack of feature and SMTP configuration, that is why I have decided to use SSMTP to have SMTP service on the server. 
+HTML is supported on all available drivers by supplying the `mail_type = 'html'`. 
 
-The custom driver currently have two kinds of information:
-- 
+The custom driver has three kinds of place: 
+- `\config\services.php` This file contains the information of third party services that are being used by the custom mail driver. You need to configure this and the 
+    ```
+    <?php
+        return [
+            /*
+            |--------------------------------------------------------------------------
+            | Third Party Services
+            |--------------------------------------------------------------------------
+            |
+            | This file is for storing the credentials for third party services such
+            | as Stripe, Mailgun, SparkPost and others. This file provides a sane
+            | default location for this type of information, allowing packages
+            | to have a conventional place to find your various credentials.
+            |
+            */
+            'mailjet' => [
+                'apikey'      => env('MAILJET_API'),
+                'apisecret'   => env('MAILJET_API_SECRET')
+            ],
+            'mailgun' => [
+                'domain' => env('MAILGUN_DOMAIN'),
+                'secret' => env('MAILGUN_SECRET'),
+            ],
+            'mandrill' => [
+                'domain' => env('MANDRILL_DOMAIN'),
+                'secret' => env('MANDRILL_SECRET'),
+            ],
+            'sendinblue' => [
+                'domain' => env('SENDINBLUE_DOMAIN'),
+                'secret' => env('SENDINBLUE_SECRET'),
+            ],
+            'custom_mail' => [
+                'url' => env('CUSTOM_MAIL_URL'),
+                'key' => env('CUSTOM_MAIL_API_KEY')
+            ],
+            'mailtrap' => [
+                'url'       => env('MAILTRAP_URL'),
+                'port'      => env('MAILTRAP_PORT'),
+                'username'  => env('MAILTRAP_USERNAME'),
+                'password'  => env('MAILTRAP_PASSWORD'),
+                'timeout'   => env('MAILTRAP_TIMEOUT')
+            ]
+        ];
+    ```
 
+- `.env` Please update your .env according to the specified environment variable on the services file.
+    ```
+    MAILJET_API=""
+    MAILJET_API_SECRET="KEY"
+
+    MANDRILL_DOMAIN="smtp.mandrillapp.com"
+    MANDRILL_SECRET="KEY"
+
+    SENDGRID_SECRET="KEY"
+    SENDGRID_DOMAIN="https://api.sendgrid.com/v3/mail/send"
+    ```
+
+- `\App\CustomMailer\CustomTransport.php:send()` This function need to be updated accordingly if you want to add extra mail driver. Currently we only support sendgrid, mailjet and the fallback to SMTP mailer by ssmtp. 
 
 
 ## 
 
-#### Sending mail via JSON request.
+#### json Body request
 You can access the sendmail via http://localhost:8000/api/sendmail
 
 Here is the default json body that can be sent
 ```
 {
-	"subject": "My First Post!",
-    "message": "This is my first mail",
-    "from_email":   "gsk.player.12@gmail.com",
-    "to": "gsk.player.12@gmail.com",
-    "send_to": [
-        {
-            "send_to_email":"gsk.player.12@gmail.com",
-            "send_to_name":"GSK"
-        }
-    ],
-    "custom_id" : "AppGettingStartedTest",
-    "mail_type" : "mailjet"
+	"subject":          "My First Post!",
+    "message":          "This is my first mail",
+    "from_email":       "asdf@gmail.com",
+    "to":               "asdf@gmail.com",
+    "send_to":          [
+                            {
+                                "send_to_email":"gsk.player.12@gmail.com",
+                                "send_to_name":"GSK"
+                            }
+                        ],
+    "custom_id":        "AppGettingStartedTest",
+    "mail_type":        "mailjet"
 }
 ```
 
@@ -81,9 +143,29 @@ There are several `Parameters` that you can set on the json body:
  - `from_name`  : The name of the sender
  - `send_to` : associative PHP array of sendto addresses. The properties correspond to the property of the JSON Payload)
  - `custom_id` : ID you want to apply a POST request to (used in case of action on a resource) 
- - `mail_type` : Type of mail driver that you will use ('mailjet', 'mailgun', 'postman')
+ - `driver_type` : Type of mail driver that you will use ('mailjet', 'mailgun', 'postman')
+ - `mail_type`: html and/or plaintext
  
+## Command line access
+Command line access is done using the default artisan command. Here are the list of available options
+```
+    *{from-email : Email address of the sender} 
+    *{from-name : The name of the sender} 
+    *{subject}
+    *{message} 
+    *{mail-type} 
+    *{driver-type}
+    *{custom-id}
+    *{queue}
+    *{send-to* : Array of recipients, use string format with pipe as separator e.g array("test@test.com|Testing user")} 
+```
+All options are required at the moment. 
 
+## Queue
+Since Lumen has access to Laravel Queue, I utilize this to dispatch the process. Asynchronous is part of the task, so I need to implement it in database mode instead of the default sync mode.  On all request, user only need to specify queue parameter with true and this process will be queued to the job table.
+
+## Logging
+Simple logging is available in the form of database table called emails. 
 
 # Lumen PHP Framework
 
