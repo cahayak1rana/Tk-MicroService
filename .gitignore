@@ -166,7 +166,6 @@ database/mysql-data/takeaway_microservice/migrations.ibd
 database/mysql-data/binlog.000009
 app/Mail/TestEmail.php
 app/CustomMailer/Untitled-1.md
-app/CustomMailer/CustomMailer.php
 ssmtp.conf
 .gitignore
 .env
