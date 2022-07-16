@@ -23,12 +23,13 @@ This project is a quick-start mailing API for microservice mail sender.
 
 ## Installation
 - Clone/fork the master branch.
-- Add mysql-data folder in the root, e.g.
+- Add mysql-data folder in the database folder, e.g.
     ```
     Tk-microservice
     |-app
     |-resources
-    |-mysql-data
+    |-database
+        |-mysql-data
     ```
 - Setup 
 - Configure the SMTP framework in the ssmtp.conf. e.g. (for mailtrap)
@@ -166,6 +167,10 @@ Since Lumen has access to Laravel Queue, I utilize this to dispatch the process.
 
 ## Logging
 Simple logging is available in the form of database table called emails. 
+
+##  Testing 
+I choose to use the default unit testing provided by Laravel. There are two unit testing that I did:
+- Normal email sending test using the PHP 
 
 # Lumen PHP Framework
 
