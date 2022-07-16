@@ -1,4 +1,3 @@
-/vendor
 /.idea
 Homestead.json
 Homestead.yaml
@@ -169,3 +168,5 @@ database/mysql-data/binlog.000009
 app/Mail/TestEmail.php
 app/CustomMailer/Untitled-1.md
 app/CustomMailer/CustomMailer.php
+ssmtp.conf
+.gitignore
