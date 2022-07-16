@@ -1,7 +1,6 @@
 /.idea
 Homestead.json
 Homestead.yaml
-.env
 .phpunit.result.cache
 database/mysql-data/#ib_16384_0.dblwr
 database/mysql-data/#ib_16384_1.dblwr
