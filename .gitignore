@@ -169,3 +169,4 @@ app/CustomMailer/Untitled-1.md
 app/CustomMailer/CustomMailer.php
 ssmtp.conf
 .gitignore
+.env
