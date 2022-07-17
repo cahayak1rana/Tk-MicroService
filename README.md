@@ -45,6 +45,10 @@ This project is a quick-start mailing API for microservice mail sender.
     ```
     docker-compose --env-file .env up --build
     ```
+- Login to the docker lumen shell environment, and execute the migration instruction to generate the tables.
+    ```
+    php artisan migrate
+    ```
 
 ## Custom mail driver.
 The custom mail driver was previously intended to be built based on the custom transport of mailgun. But after trying to understand the requirements, I have decided to use simple PHP implementation of mail delivery that utilize the PHP mail functionality. Inspired by some code from O'Brien (https://eoghanobrien.com). The problem that I faced with this approach is the lack of feature and SMTP configuration, that is why I have decided to use SSMTP to have SMTP service on the server. 

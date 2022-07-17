@@ -555,9 +555,15 @@ class CustomTransport
             ])->post($this->driver_url.'/post', [
                 
             ]);
+
             $this->setEmailsModel($request_type);
 
-
+            if (!empty($extra_parameters)) {
+                if ($extra_parameters['test'] == true) {
+                    return $response;
+                }
+            }
+            
             return $response->successful();
         }
         else if ($request_type == 'mailjet') {

@@ -34,6 +34,16 @@ class EmailTest extends TestCase
         $this->client = new Client(['handler' => $this->mock_handler]);
     }
 
+    /**
+     * This function is used to test email command. 
+     */
+    public function testEmailCommand() {
+        $result = $this->artisan('mail:send "test@example.com"  "test@example.com" "helo" "this is email body" "html" "postman" "" "" "to@example.com"');
+
+        $this->assertTrue($result === 0);
+        
+    }
+
     public function testSendMail()
     {
         //$message = $this->createEmail();
@@ -43,15 +53,16 @@ class EmailTest extends TestCase
         $config = $this->app['config']->get('services.custom_mail', []);
 
         $transport = new CustomTransport($config['key'], $config['url']);
-        $transport->setTo('to@example.com', 'test');
+        $transport->setTo('to@example.com', 'test', 'array');
         $transport->setCc(array('cc@example.com'));
         $transport->setBcc(array('bcc@example.com'));
         $transport->setFrom('from@example.com', 'from');
+        
 
-
-        $response = $transport->send('postman');
+        $response = $transport->send('postman', array('test' => true));
 
         $body = $response->body();
+
         $data = json_decode($body, true);
 
         $expected = [
@@ -59,6 +70,12 @@ class EmailTest extends TestCase
                 [
                     'name' => null,
                     'email' => 'to@example.com',
+                ]
+            ],
+            'from' => [
+                [
+                    'name' => NULL,
+                    'email' => 'from@example.com',
                 ]
             ],
             'cc' => [
@@ -81,7 +98,7 @@ class EmailTest extends TestCase
         // $this->assertEquals($test_url, (string)$response->getUri());
 
         // Test the correct data was sent to the API
-        $this->assertEquals($expected, $data);
+        $this->assertEquals($expected, $data['data']);
 
         // Test that the authorization key was sent in the headers
         $this->assertEquals('Bearer secret-key', $response->getHeaderLine('Authorization'));
