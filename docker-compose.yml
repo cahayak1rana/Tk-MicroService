@@ -16,6 +16,21 @@ services:
     restart: always
     depends_on:
       - db
+  lumen_poster:
+  #* Serve composer at port 8000
+    ports:
+      - "8001:8000"
+  #* Working directory mount. 
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/vendor/
+      - ./ssmtp.conf:/etc/ssmtp/ssmtp.conf
+    build: .
+  #* command to be executed.
+    command: php -S lumen_poster:8000 -t public
+    restart: always
+    depends_on:
+      - db
   db:
     image: mysql:latest
     restart: always
