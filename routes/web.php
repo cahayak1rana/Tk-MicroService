@@ -2,6 +2,8 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
+use App\Http\Controllers\AuthenticationController;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -21,3 +23,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('sendmail', ['uses' => 'SendMailController@sendMail']);
     $router->get('sendmail', ['uses' => 'SendMailController@sendMail']);
 });
+
+$router->get('login', ['as' => 'login', 'uses' => 'AuthenticationController@login']);
+$router->post('post-login', ['as' => 'login.post', 'uses'=> 'AuthenticationController@postLogin']);
+$router->get('registration', ['as' => 'register', 'uses' => 'AuthenticationController@registration']);
+$router->post('post-registration', ['as' => 'register.post', 'uses' => 'AuthenticationController@postRegistration']); 
+$router->get('reset', ['as' => 'reset', 'uses' => 'AuthenticationController@reset']);
+$router->post('post-reset', ['as' => 'reset.post', 'uses' => 'AuthenticationController@postReset']); 
+$router->get('dashboard', ['as' => 'dashboard', 'uses' => 'AuthenticationController@dashboard']); 
+$router->get('logout', ['as' => 'logout', 'uses' => 'AuthenticationController@logout']);

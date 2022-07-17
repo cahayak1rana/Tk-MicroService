@@ -9,17 +9,20 @@ This project is a quick-start mailing API for microservice mail sender.
 - [Custom mail driver](#custom-mail-driver)
     - [json Body request](#json-body-request)
 - [Command line access](#command-line-access)
-- [Queue]
-- [Logging]
+- [Queue] (#queue)
+- [Logging] (#logging)
 - [Lumen](#lumen)
+- [Testing](#testing)
+- [Extras](#extras)
 
 ## Technologies
 - Lumen, Lumen is chosen as part of the requirements of the task, since it iis lightweight and designed for microservice. 
 - Custom mail transport is used by extending the mailable class of laravel. 
-- Two mail custom drivers are used.
+- Two mail custom drivers are used, you can try to send a request to http://localhost:8000/api/sendmail/, see #json-body-request for list of parameters.
 - Continue with Guzzle update and also . 
 - Eloquent is used to store log information of emails.
 - For queue and dispatcher, I choose to use the default queue of Laravel since it is easier to implement. 
+- Simple registration and reset password features were built on the system that can be accessed on port 8001 (http://localhost:8001/registration).  
 
 ## Installation
 - Clone/fork the master branch.
@@ -113,12 +116,12 @@ The custom driver has three kinds of place:
     ```
 
 - `\App\CustomMailer\CustomTransport.php:send()` This function need to be updated accordingly if you want to add extra mail driver. Currently we only support sendgrid, mailjet and the fallback to SMTP mailer by ssmtp. 
-
+    Currently I have implemented the email sending using GuzzleHTTP request (for sending API requests to different mail drivers, e.g. sendgrid, mailjet) and also default mail() function of PHP for fallback. 
 
 ## 
 
 #### json Body request
-You can access the sendmail via http://localhost:8000/api/sendmail
+You can access the sendmail functionality with POST request via http://localhost:8000/api/sendmail
 
 Here is the default json body that can be sent
 ```
@@ -174,7 +177,14 @@ Simple logging is available in the form of database table called emails.
 
 ##  Testing 
 I choose to use the default unit testing provided by Laravel. There are two unit testing that I did:
-- Normal email sending test using the PHP 
+- Testing email sending using postman API. 
+- Testing email command using php artisan. 
+
+##  Extras
+A simple registration and reset password page were built as part of the microservice. This can be accessed on `http://localhost:8001`. There are two routes:
+- `http://localhost:8001/registration/`
+- `http://localhost:8001/reset/`
+The page won't have redirection and authentication due to limitation of Laravel lumen.
 
 # Lumen PHP Framework
 
