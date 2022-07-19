@@ -11,7 +11,7 @@ This project is a quick-start mailing API for microservice mail sender.
 - [Command line access](#command-line-access)
 - [Queue](#queue)
 - [Logging](#logging)
-- [Lumen](#lumen)
+- [Lumen PHP Framework](#Lumen-PHP-Framework)
 - [Testing](#testing)
 - [Extras](#extras)
 - [Todos](#todos)
