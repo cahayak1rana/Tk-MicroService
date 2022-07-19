@@ -14,6 +14,7 @@ This project is a quick-start mailing API for microservice mail sender.
 - [Lumen](#lumen)
 - [Testing](#testing)
 - [Extras](#extras)
+- [Todos](#todos)
 
 ## Technologies
 - Lumen, Lumen is chosen as part of the requirements of the task, since it iis lightweight and designed for microservice. 
@@ -185,6 +186,12 @@ A simple registration and reset password page were built as part of the microser
 - `http://localhost:8001/registration/`
 - `http://localhost:8001/reset/`
 The page won't have redirection and authentication due to limitation of Laravel lumen.
+
+## Todos
+This code is far from perfect, there are several things that can be improved:
+- Clean and beautify the code.
+- Adjusted the CustomTransport PHP class to be able to handle driver configuration via database. 
+- Graceful error handling (failover to other services). 
 
 # Lumen PHP Framework
 
